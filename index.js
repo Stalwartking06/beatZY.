@@ -4,7 +4,7 @@ const app = express();
 const port = 3001;
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/Beatzy', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb+srv://akshatjoshi753:ShaijalandAkshatProject@ecommerce.jtuo2qf.mongodb.net/?retryWrites=true&w=majority&appName=ECommerce', { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 const db = mongoose.connection;
@@ -14,7 +14,6 @@ db.once('open', () => {
 });
 
 const SignupSchema = new mongoose.Schema({
-  id: Number,
   name: String,
   email: String,
   phone1: Number,
@@ -30,8 +29,8 @@ app.use(express.json());
 //signup ka data
 app.post('/Signup', async (req, res) => {//.loggin ki jgah jo bhi colection ka name fre
   try {
-    const { id,name, email, phone1 ,passw1,passw2} = req.body;
-    const newItem = new SignUpData({ id,name, email, phone1,passw1,passw2 });
+    const { name, email, phone1 ,passw1,passw2} = req.body;
+    const newItem = new SignUpData({ name, email, phone1,passw1,passw2 });
     await newItem.save();
     res.json({ message: 'Item added successfully' });
   } catch (error) {
