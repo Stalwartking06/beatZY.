@@ -62,38 +62,34 @@ const AddProductSchema = new mongoose.Schema({
 const AddProductData = mongoose.model('AddProduct', AddProductSchema);
 
 // Routes
-app.post('/Signup', async (req, res) => {
+
+// Route for retrieving all products
+app.get("/product", async (req, res) => {
   try {
-    const { name, email, phone1, passw1, passw2 } = req.body;
-    const newItem = new SignUpData({ name, email, phone1, passw1, passw2 });
-    await newItem.save();
-    res.json({ message: 'Item added successfully' });
+    const products = await AddProductData.find();
+    res.json(products);
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Failed to add item' });
+    res.status(500).json({ error: 'Failed to retrieve products' });
   }
 });
 
-app.post("/login", (req, res) => {
-  const { email, passw1 } = req.body;
-  SignUpData.findOne({ email })
-    .then(user => {
-      if (user) {
-        if (user.passw1 === passw1) {
-          res.json("Success");
-        } else {
-          res.json("The password is incorrect");
-        }
-      } else {
-        res.json("No record found");
-      }
-    })
-    .catch(err => {
-      console.error('Error:', err);
-      res.status(500).json({ error: 'Failed to find user' });
-    });
+// Route for retrieving a single product by ID
+app.get("/product/:p_id", async (req, res) => {
+  try {
+    const productId = req.params.p_id;
+    const product = await AddProductData.findOne({ p_id: productId });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json(product);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Failed to retrieve product' });
+  }
 });
 
+// Route for adding a new product
 app.post("/product", (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
@@ -113,17 +109,40 @@ app.post("/product", (req, res) => {
     }
   });
 });
-// Route for retrieving all All products
-app.get("/product", async (req, res) => {
+
+// Route for user signup
+app.post('/Signup', async (req, res) => {
   try {
-    const products = await AddProductData.find();
-    res.json(products);
+    const { name, email, phone1, passw1, passw2 } = req.body;
+    const newItem = new SignUpData({ name, email, phone1, passw1, passw2 });
+    await newItem.save();
+    res.json({ message: 'Item added successfully' });
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: 'Failed to retrieve rashi products' });
+    res.status(500).json({ error: 'Failed to add item' });
   }
 });
 
+// Route for user login
+app.post("/login", (req, res) => {
+  const { email, passw1 } = req.body;
+  SignUpData.findOne({ email })
+    .then(user => {
+      if (user) {
+        if (user.passw1 === passw1) {
+          res.json("Success");
+        } else {
+          res.json("The password is incorrect");
+        }
+      } else {
+        res.json("No record found");
+      }
+    })
+    .catch(err => {
+      console.error('Error:', err);
+      res.status(500).json({ error: 'Failed to find user' });
+    });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
