@@ -110,6 +110,56 @@ app.post("/product", (req, res) => {
   });
 });
 
+// Route for updating an existing product
+app.put("/product/:p_id", (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Error uploading file");
+    } else {
+      try {
+        const productId = req.params.p_id;
+        const updatedData = {
+          name: req.body.name,
+          description: req.body.description,
+          category: req.body.category,
+          price: req.body.price,
+        };
+        if (req.file) {
+          updatedData.pimage = "http://localhost:3001/uploads/" + req.file.filename;
+        }
+        const updatedProduct = await AddProductData.findOneAndUpdate(
+          { p_id: productId },
+          updatedData,
+          { new: true }
+        );
+        if (!updatedProduct) {
+          return res.status(404).json({ error: 'Product not found' });
+        }
+        res.json(updatedProduct);
+      } catch (error) {
+        console.error('Error updating product:', error);
+        res.status(500).json({ error: 'Failed to update product' });
+      }
+    }
+  });
+});
+
+// Route for deleting an existing product
+app.delete("/product/:p_id", async (req, res) => {
+  try {
+    const productId = req.params.p_id;
+    const deletedProduct = await AddProductData.findOneAndDelete({ p_id: productId });
+    if (!deletedProduct) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json({ message: 'Product deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ error: 'Failed to delete product' });
+  }
+});
+
 // Route for user signup
 app.post('/Signup', async (req, res) => {
   try {
@@ -138,12 +188,12 @@ app.post("/login", (req, res) => {
         res.json("No record found");
       }
     })
-    .catch(err => {
-      console.error('Error:', err);
-      res.status(500).json({ error: 'Failed to find user' });
+    .catch(error => {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Failed to log in' });
     });
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on port ${port}`);
 });
