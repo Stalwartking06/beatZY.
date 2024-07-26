@@ -7,12 +7,12 @@ const mongoose = require('mongoose');
 const Order = require('./models/Order');
 const { sendOTP, verifyOTP, generateQR } = require('./utils/otp');
 
-const app = express();
-const port = 3001;
+const app = express(); //express ko app k through use 
+const port = 3001; //port no 
 
 // Ensure the uploads directory exists
-const uploadsDir = path.join(__dirname, 'public/uploads');
-if (!fs.existsSync(uploadsDir)) {
+const uploadsDir = path.join(__dirname, 'public/uploads');//public folder k andar uload me sre save hore h
+if (!fs.existsSync(uploadsDir)) { //aur us photo ka url save hoga db me
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
     cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+    cb(null, Date.now() + '-' + file.originalname);//date sAVE karega
   }
 });
 const upload = multer({ storage: storage }).single('pimage');
